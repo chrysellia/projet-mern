@@ -1,0 +1,227 @@
+/* Styles globaux pour l'application */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.App {
+    min-height: 100vh;
+    text-align: center;
+}
+
+/* Boutons principaux */
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-success:hover {
+    background-color: #1e7e34;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+}
+
+/* Formulaires */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-control.error {
+    border-color: #dc3545;
+}
+
+.error-text {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Cartes et conteneurs */
+.card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+}
+
+/* Alertes */
+.alert {
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+/* Loading */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 18px;
+    color: #666;
+}
+
+/* Navigation */
+.nav-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.nav-tab {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.nav-tab.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.nav-tab:hover:not(.active) {
+    background-color: #e9ecef;
+}
+
+/* Statuts */
+.status-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-a-faire {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.status-en-cours {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.status-termine {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav-tabs {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .card {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+}
