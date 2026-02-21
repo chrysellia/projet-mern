@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Task, User } from '../types';
 import { taskService, userService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import AdminNotificationPanel from './AdminNotificationPanel';
 
 interface AdminStats {
     totalTasks: number;
@@ -31,6 +33,9 @@ const AdminDashboard: React.FC = () => {
         topUsers: []
     });
     const [loading, setLoading] = useState(true);
+    const [notificationLoading, setNotificationLoading] = useState(false);
+    const [refreshNotifications, setRefreshNotifications] = useState(0);
+    const { user } = useAuth();
 
     useEffect(() => {
         fetchDashboardData();
@@ -101,6 +106,36 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
+    const sendNotifications = async () => {
+        try {
+            setNotificationLoading(true);
+            
+            // Envoyer les notifications pour les tâches en retard
+            const response = await fetch('http://localhost:5001/api/notifications/check-overdue', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert(`✅ ${result.notificationsSent} notifications envoyées !`);
+                // Rafraîchir les données
+                fetchDashboardData();
+            } else {
+                alert(`❌ Erreur: ${result.message}`);
+            }
+        } catch (error) {
+            console.error('Error sending notifications:', error);
+            alert('❌ Erreur lors de l\'envoi des notifications');
+        } finally {
+            setNotificationLoading(false);
+        }
+    };
+
     if (loading) {
         return (
             <div style={{ textAlign: 'center', padding: '40px' }}>
@@ -118,6 +153,22 @@ const AdminDashboard: React.FC = () => {
                 <p style={{ margin: '0', color: '#666' }}>
                     Vue d'ensemble complète du système
                 </p>
+                <button
+                    onClick={sendNotifications}
+                    disabled={notificationLoading}
+                    style={{
+                        padding: '10px 20px',
+                        backgroundColor: notificationLoading ? '#ccc' : '#28a745',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: notificationLoading ? 'not-allowed' : 'pointer',
+                        fontSize: '14px',
+                        marginLeft: '20px'
+                    }}
+                >
+                    {notificationLoading ? '⏳ Envoi...' : '📧 Envoyer les notifications'}
+                </button>
             </div>
 
             {/* Statistiques principales */}
@@ -592,6 +643,9 @@ const AdminDashboard: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            {/* Panneau de notifications pour l'admin */}
+            <AdminNotificationPanel refreshTrigger={refreshNotifications} />
         </div>
     );
 };

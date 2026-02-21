@@ -4,9 +4,8 @@ const {
     sendManualNotification, 
     getNotificationStats, 
     checkOverdueTasks, 
-    checkUpcomingDeadlines,
-    resetNotificationFlags 
-} = require('../services/notificationService');
+    checkUpcomingDeadlines
+} = require('../services/notificationServiceSimple');
 
 const router = express.Router();
 
@@ -91,10 +90,14 @@ router.post('/check-upcoming', [protect, admin], async (req, res) => {
 // @access  Private/Admin
 router.post('/reset-flags', [protect, admin], async (req, res) => {
     try {
-        const result = await resetNotificationFlags();
-        res.json(result);
+        await Task.updateMany({}, { 
+            notified: false, 
+            reminderSent: false 
+        });
+        console.log('🔄 Notification flags reset');
+        res.json({ success: true, message: 'Notification flags reset successfully' });
     } catch (error) {
-        console.error('Reset flags error:', error);
+        console.error('❌ Error resetting notification flags:', error);
         res.status(500).json({ 
             message: 'Server error resetting flags',
             error: error.message 
