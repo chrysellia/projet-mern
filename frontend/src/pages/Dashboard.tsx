@@ -4,11 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
 import UserManagement from '../components/UserManagement';
+import UserDashboard from '../components/UserDashboard';
 
 const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState<'tasks' | 'create' | 'users'>('tasks');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'tasks' | 'create' | 'users'>('dashboard');
     const [refreshTasks, setRefreshTasks] = useState(0);
 
     const handleLogout = () => {
@@ -67,6 +68,15 @@ const Dashboard: React.FC = () => {
             </header>
 
             <div style={{ marginBottom: '20px' }}>
+                {user?.role === 'user' && (
+                    <button
+                        onClick={() => setActiveTab('dashboard')}
+                        style={getTabStyle('dashboard')}
+                    >
+                        Tableau de bord
+                    </button>
+                )}
+                
                 <button
                     onClick={() => setActiveTab('tasks')}
                     style={getTabStyle('tasks')}
@@ -94,6 +104,10 @@ const Dashboard: React.FC = () => {
             </div>
 
             <div>
+                {activeTab === 'dashboard' && user?.role === 'user' && (
+                    <UserDashboard />
+                )}
+                
                 {activeTab === 'tasks' && (
                     <TaskList key={refreshTasks} />
                 )}
