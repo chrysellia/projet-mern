@@ -3,7 +3,11 @@ import { User } from '../types';
 import { userService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-const UserManagement: React.FC = () => {
+interface UserManagementProps {
+    refreshTasks?: number;
+}
+
+const UserManagement: React.FC<UserManagementProps> = ({ refreshTasks }) => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -12,7 +16,7 @@ const UserManagement: React.FC = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [refreshTasks]);
 
     const fetchUsers = async () => {
         try {
@@ -20,7 +24,7 @@ const UserManagement: React.FC = () => {
             const fetchedUsers = await userService.getAll();
             setUsers(fetchedUsers);
             setError('');
-        } catch (error: any) {
+        } catch (error) {
             setError('Erreur lors du chargement des utilisateurs');
             console.error('Error fetching users:', error);
         } finally {
@@ -33,7 +37,7 @@ const UserManagement: React.FC = () => {
             try {
                 await userService.delete(userId);
                 setUsers(users.filter(user => user._id !== userId));
-            } catch (error: any) {
+            } catch (error) {
                 setError('Erreur lors de la suppression de l\'utilisateur');
                 console.error('Error deleting user:', error);
             }
@@ -76,8 +80,39 @@ const UserManagement: React.FC = () => {
                 </div>
             )}
 
+            {currentUser?.role === 'admin' && (
+                <div style={{ marginBottom: '20px' }}>
+                    <a 
+                        href="/register"
+                        style={{
+                            display: 'inline-block',
+                            padding: '10px 20px',
+                            backgroundColor: '#28a745',
+                            color: 'white',
+                            textDecoration: 'none',
+                            borderRadius: '4px',
+                            marginRight: '10px'
+                        }}
+                    >
+                        Créer un nouvel utilisateur
+                    </a>
+                </div>
+            )}
+
+            <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#e9ecef', borderRadius: '4px' }}>
+                <h4 style={{ margin: '0 0 10px 0', color: '#495057' }}>
+                    {currentUser?.role === 'admin' ? '🔐 Gestion des utilisateurs' : '👥 Liste des utilisateurs'}
+                </h4>
+                <p style={{ margin: '0', fontSize: '14px', color: '#6c757d' }}>
+                    {currentUser?.role === 'admin' 
+                        ? 'En tant qu\'administrateur, vous pouvez créer, modifier et supprimer des comptes utilisateurs.'
+                        : 'En tant qu\'utilisateur, vous pouvez voir la liste des utilisateurs pour assigner des tâches.'
+                    }
+                </p>
+            </div>
+
             {editingUser && (
-                <UserForm
+                <UserForm 
                     user={editingUser}
                     onUserUpdated={handleUserUpdated}
                     onCancel={() => setEditingUser(null)}
@@ -176,21 +211,20 @@ const UserForm: React.FC<UserFormProps> = ({ user, onUserUpdated, onCancel }) =>
         email: user.email,
         role: user.role
     });
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         
-        // Effacer l'erreur quand l'utilisateur commence à taper
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
 
     const validateForm = () => {
-        const newErrors: { [key: string]: string } = {};
+        const newErrors: Record<string, string> = {};
         
         if (!formData.username.trim()) {
             newErrors.username = 'Nom d\'utilisateur est requis';
@@ -221,6 +255,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onUserUpdated, onCancel }) =>
             
             const updatedUser = await userService.update(user._id, formData);
             onUserUpdated(updatedUser);
+            
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Erreur lors de la mise à jour de l\'utilisateur';
             setErrors({ general: errorMessage });

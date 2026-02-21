@@ -8,10 +8,11 @@ const Register: React.FC = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'user' as 'admin' | 'user'
+        role: 'user'
     });
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const { register, loading, error, clearError } = useAuth();
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [loading, setLoading] = useState(false);
+    const { register, clearError, error } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -69,7 +70,7 @@ const Register: React.FC = () => {
                 username: formData.username,
                 email: formData.email,
                 password: formData.password,
-                role: formData.role
+                role: formData.role as 'user' | 'admin'
             });
             navigate('/dashboard');
         } catch (error) {
@@ -195,6 +196,16 @@ const Register: React.FC = () => {
                         <option value="user">Utilisateur</option>
                         <option value="admin">Administrateur</option>
                     </select>
+                    {formData.role === 'admin' && (
+                        <p style={{ 
+                            fontSize: '12px', 
+                            color: '#dc3545', 
+                            marginTop: '5px',
+                            fontStyle: 'italic'
+                        }}>
+                            ⚠️ Attention : Seul un administrateur existant peut créer un autre administrateur
+                        </p>
+                    )}
                 </div>
 
                 <button

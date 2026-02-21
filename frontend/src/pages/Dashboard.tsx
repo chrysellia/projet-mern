@@ -61,6 +61,22 @@ const Dashboard: React.FC = () => {
                 >
                     Déconnexion
                 </button>
+                {user?.role === 'admin' && (
+                    <button
+                        onClick={() => setActiveTab('users')}
+                        style={{
+                            marginRight: '10px',
+                            padding: '10px 20px',
+                            backgroundColor: activeTab === 'users' ? '#007bff' : '#6c757d',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Gérer les utilisateurs
+                    </button>
+                )}
             </header>
 
             <div style={{ marginBottom: '20px' }}>
@@ -78,14 +94,12 @@ const Dashboard: React.FC = () => {
                     Créer une tâche
                 </button>
 
-                {user?.role === 'admin' && (
-                    <button
-                        onClick={() => setActiveTab('users')}
-                        style={getTabStyle('users')}
-                    >
-                        Gérer les utilisateurs
-                    </button>
-                )}
+                <button
+                    onClick={() => setActiveTab('users')}
+                    style={getTabStyle('users')}
+                >
+                    {user?.role === 'admin' ? 'Gérer les utilisateurs' : 'Voir les utilisateurs'}
+                </button>
             </div>
 
             <div>
@@ -97,8 +111,8 @@ const Dashboard: React.FC = () => {
                     <TaskForm onTaskCreated={handleTaskCreated} />
                 )}
 
-                {activeTab === 'users' && user?.role === 'admin' && (
-                    <UserManagement />
+                {activeTab === 'users' && (
+                    <UserManagement refreshTasks={refreshTasks} />
                 )}
             </div>
         </div>
