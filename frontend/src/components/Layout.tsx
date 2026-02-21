@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/global.css';
+import '../styles/themes.css';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -11,7 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     return (
         <div className="layout">
-            <header className="header">
+            <header className="header dashboard-header">
                 <div className="header-content">
                     <div className="header-left">
                         <h1>Task Manager</h1>
