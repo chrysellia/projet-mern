@@ -5,6 +5,7 @@ import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
 import UserManagement from '../components/UserManagement';
 import UserDashboard from '../components/UserDashboard';
+import AdminDashboard from '../components/AdminDashboard';
 
 const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
@@ -68,14 +69,12 @@ const Dashboard: React.FC = () => {
             </header>
 
             <div style={{ marginBottom: '20px' }}>
-                {user?.role === 'user' && (
-                    <button
-                        onClick={() => setActiveTab('dashboard')}
-                        style={getTabStyle('dashboard')}
-                    >
-                        Tableau de bord
-                    </button>
-                )}
+                <button
+                    onClick={() => setActiveTab('dashboard')}
+                    style={getTabStyle('dashboard')}
+                >
+                    Tableau de bord
+                </button>
                 
                 <button
                     onClick={() => setActiveTab('tasks')}
@@ -106,6 +105,10 @@ const Dashboard: React.FC = () => {
             <div>
                 {activeTab === 'dashboard' && user?.role === 'user' && (
                     <UserDashboard />
+                )}
+                
+                {activeTab === 'dashboard' && user?.role === 'admin' && (
+                    <AdminDashboard />
                 )}
                 
                 {activeTab === 'tasks' && (
