@@ -1,0 +1,476 @@
+/* Styles Trello-like pour les cartes verticales */
+
+/* Conteneur principal Trello */
+.trello-board {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  overflow-x: auto;
+  min-height: 600px;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+}
+
+/* Colonnes Trello */
+.trello-column {
+  flex: 1;
+  min-width: 320px;
+  max-width: 400px;
+  background-color: var(--bg-tertiary);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.trello-column:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* En-tête de colonne */
+.trello-column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.trello-column-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trello-column-count {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* Conteneur de cartes */
+.trello-cards-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: 500px;
+  padding-right: 8px;
+}
+
+/* Scrollbar personnalisée pour les colonnes */
+.trello-cards-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.trello-cards-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.trello-cards-container::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.trello-cards-container::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Cartes Trello */
+.trello-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.trello-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.trello-card.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+/* En-tête de carte */
+.trello-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.trello-card-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.trello-card-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.trello-card:hover .trello-card-actions {
+  opacity: 1;
+}
+
+.trello-card-action {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.trello-card-action:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Contenu de carte */
+.trello-card-content {
+  margin-bottom: 8px;
+}
+
+.trello-card-description {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Pied de carte */
+.trello-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.trello-card-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.trello-card-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trello-card-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.trello-card-badge.à-faire {
+  background-color: #dc3545;
+  color: white;
+}
+
+.trello-card-badge.en-cours {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.trello-card-badge.terminé {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Avatar dans les cartes */
+.trello-card-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Zone de drop */
+.trello-drop-zone {
+  min-height: 60px;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.trello-drop-zone.active {
+  border-color: var(--button-primary);
+  background-color: var(--button-primary);
+  color: white;
+}
+
+/* Bouton d'ajout de carte */
+.trello-add-card {
+  width: 100%;
+  padding: 12px;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.trello-add-card:hover {
+  border-color: var(--button-primary);
+  color: var(--button-primary);
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Colonnes spécifiques selon le statut */
+.trello-column.à-faire {
+  border-left: 4px solid #dc3545;
+}
+
+.trello-column.en-cours {
+  border-left: 4px solid #ffc107;
+}
+
+.trello-column.terminé {
+  border-left: 4px solid #28a745;
+}
+
+.trello-column.à-faire .trello-column-title {
+  color: #dc3545;
+}
+
+.trello-column.en-cours .trello-column-title {
+  color: #ffc107;
+}
+
+.trello-column.terminé .trello-column-title {
+  color: #28a745;
+}
+
+/* Deadline dans les cartes */
+.trello-card-deadline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.trello-card-deadline.overdue {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.trello-card-deadline.soon {
+  color: #ffc107;
+  font-weight: 500;
+}
+
+/* Tags dans les cartes */
+.trello-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.trello-card-tag {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 500;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+/* Mode Dark adapté */
+[data-theme="dark"] .trello-board {
+  background-color: #0d1117;
+}
+
+[data-theme="dark"] .trello-column {
+  background-color: #161b22;
+  border-color: #30363d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .trello-column:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .trello-card {
+  background-color: #21262d;
+  border-color: #30363d;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .trello-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .trello-column-header {
+  border-bottom-color: #30363d;
+}
+
+[data-theme="dark"] .trello-card-footer {
+  border-top-color: #30363d;
+}
+
+[data-theme="dark"] .trello-drop-zone {
+  border-color: #30363d;
+  color: #6e7681;
+}
+
+[data-theme="dark"] .trello-drop-zone.active {
+  border-color: #238636;
+  background-color: #238636;
+  color: white;
+}
+
+[data-theme="dark"] .trello-add-card {
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+[data-theme="dark"] .trello-add-card:hover {
+  border-color: #238636;
+  color: #238636;
+  background-color: rgba(35, 134, 54, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .trello-board {
+    flex-direction: column;
+    padding: 12px;
+    gap: 16px;
+  }
+  
+  .trello-column {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  
+  .trello-cards-container {
+    max-height: 400px;
+  }
+  
+  .trello-card-title {
+    font-size: 0.8rem;
+  }
+  
+  .trello-card-description {
+    font-size: 0.7rem;
+  }
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.trello-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Drag and Drop styles */
+.trello-card.drag-over {
+  border: 2px solid var(--button-primary);
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
+}
+
+.trello-column.drag-over {
+  background-color: rgba(0, 123, 255, 0.05);
+  border-color: var(--button-primary);
+}
+
+/* Loading states */
+.trello-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.trello-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--border-color);
+  border-top: 2px solid var(--button-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

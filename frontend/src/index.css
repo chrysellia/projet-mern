@@ -1,5 +1,7 @@
 @import './styles/themes.css';
 @import './styles/dark-mode-reset.css';
+@import './styles/cards.css';
+@import './styles/trello.css';
 
 body {
   margin: 0;

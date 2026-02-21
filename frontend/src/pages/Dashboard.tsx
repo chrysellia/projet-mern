@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import TaskList from '../components/TaskList';
+import TrelloBoard from '../components/TrelloBoard';
 import TaskForm from '../components/TaskForm';
 import UserManagement from '../components/UserManagement';
 import UserDashboard from '../components/UserDashboard';
@@ -89,7 +89,7 @@ const Dashboard: React.FC = () => {
                     onClick={() => setActiveTab('tasks')}
                     style={getTabStyle('tasks')}
                 >
-                    Tâches
+                    📋 Tâches
                 </button>
                 
                 {user?.role === 'admin' && (
@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
                 )}
                 
                 {activeTab === 'tasks' && (
-                    <TaskList key={refreshTasks} />
+                    <TrelloBoard key={refreshTasks} onTaskUpdated={() => setRefreshTasks(prev => prev + 1)} />
                 )}
                 
                 {activeTab === 'create' && (

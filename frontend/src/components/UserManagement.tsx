@@ -126,70 +126,74 @@ const UserManagement: React.FC<UserManagementProps> = ({ refreshTasks }) => {
                     {users.map(user => (
                         <div
                             key={user._id}
-                            style={{
-                                border: '1px solid #ddd',
-                                borderRadius: '8px',
-                                padding: '15px',
-                                marginBottom: '15px',
-                                backgroundColor: '#f8f9fa'
-                            }}
+                            className={`card card-hover ${user.role === 'admin' ? 'card-gradient primary' : ''}`}
                         >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div>
-                                    <h3 style={{ margin: '0 0 10px 0' }}>
-                                        {user.username}
-                                        <span
-                                            style={{
-                                                backgroundColor: getRoleColor(user.role),
-                                                color: 'white',
-                                                padding: '2px 8px',
-                                                borderRadius: '12px',
-                                                fontSize: '12px',
-                                                marginLeft: '10px'
-                                            }}
-                                        >
-                                            {user.role}
-                                        </span>
-                                    </h3>
-                                    <p style={{ margin: '0 0 5px 0', color: '#666' }}>
-                                        Email: {user.email}
-                                    </p>
-                                    <p style={{ margin: '0', color: '#666', fontSize: '14px' }}>
-                                        Inscrit le: {new Date(user.createdAt).toLocaleDateString()}
-                                    </p>
+                            <div className="card-header">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div className="card-avatar">
+                                        {user.username.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <h3 className="card-title">
+                                            {user.username}
+                                            <span className={`card-badge ${user.role}`}>
+                                                {user.role}
+                                            </span>
+                                        </h3>
+                                        <p className="card-subtitle">{user.email}</p>
+                                    </div>
                                 </div>
-                                
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    <button
-                                        onClick={() => handleEditUser(user)}
-                                        style={{
-                                            padding: '8px 16px',
-                                            backgroundColor: '#007bff',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Modifier
-                                    </button>
-                                    
-                                    {user._id !== currentUser?._id && (
+                                {currentUser?.role === 'admin' && (
+                                    <div className="card-actions">
+                                        <button
+                                            onClick={() => handleEditUser(user)}
+                                            className="card-action primary"
+                                        >
+                                            ✏️ Modifier
+                                        </button>
                                         <button
                                             onClick={() => handleDeleteUser(user._id)}
-                                            style={{
-                                                padding: '8px 16px',
-                                                backgroundColor: '#dc3545',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer'
-                                            }}
+                                            className="card-action danger"
                                         >
-                                            Supprimer
+                                            🗑️ Supprimer
                                         </button>
-                                    )}
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="card-content">
+                                <div className="card-metrics">
+                                    <div className="card-metric">
+                                        <div className="card-metric-value">
+                                            {user.role === 'admin' ? '🔐' : '👤'}
+                                        </div>
+                                        <div className="card-metric-label">Rôle</div>
+                                    </div>
+                                    <div className="card-metric">
+                                        <div className="card-metric-value">
+                                            {user.email}
+                                        </div>
+                                        <div className="card-metric-label">Email</div>
+                                    </div>
+                                    <div className="card-metric">
+                                        <div className="card-metric-value">
+                                            {user.username}
+                                        </div>
+                                        <div className="card-metric-label">Nom d'utilisateur</div>
+                                    </div>
                                 </div>
+                            </div>
+                            
+                            <div className="card-footer">
+                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                                    {user.role === 'admin' ? 'Administrateur du système' : 'Utilisateur standard'}
+                                </div>
+                                {user.role === 'admin' && (
+                                    <div className="card-tags">
+                                        <span className="card-tag primary">Admin</span>
+                                        <span className="card-tag success">Accès complet</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Task, TaskFormData, User } from '../types';
 import { taskService, userService } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import '../styles/themes.css';
 
 interface TaskFormProps {
     task?: Task;
@@ -10,12 +10,7 @@ interface TaskFormProps {
     onCancel?: () => void;
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ 
-    task, 
-    onTaskCreated, 
-    onTaskUpdated, 
-    onCancel 
-}) => {
+const TaskForm: React.FC<TaskFormProps> = ({ task, onTaskCreated, onTaskUpdated, onCancel }) => {
     const [formData, setFormData] = useState<TaskFormData>({
         title: '',
         description: '',
@@ -24,13 +19,13 @@ const TaskForm: React.FC<TaskFormProps> = ({
         deadline: ''
     });
     const [users, setUsers] = useState<User[]>([]);
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(false);
-    const { user } = useAuth();
-    const isEditing = !!task;
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if (isEditing) {
+        fetchUsers();
+        if (task) {
             setFormData({
                 title: task.title,
                 description: task.description || '',
@@ -39,17 +34,11 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 deadline: task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : ''
             });
         }
-    }, [task, isEditing]);
-
-    useEffect(() => {
-        fetchUsers();
-    }, []);
+    }, [task]);
 
     const fetchUsers = async () => {
         try {
-            console.log('Fetching users...');
             const fetchedUsers = await userService.getAll();
-            console.log('Fetched users:', fetchedUsers);
             setUsers(fetchedUsers);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -60,32 +49,32 @@ const TaskForm: React.FC<TaskFormProps> = ({
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         
-        // Effacer l'erreur quand l'utilisateur commence à taper
+        // Clear error for this field
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
 
     const validateForm = () => {
-        const newErrors: { [key: string]: string } = {};
+        const newErrors: Record<string, string> = {};
         
         if (!formData.title.trim()) {
-            newErrors.title = 'Titre est requis';
+            newErrors.title = 'Le titre est requis';
         }
         
         if (!formData.assignedTo) {
-            newErrors.assignedTo = 'Veuillez assigner cette tâche à quelqu\'un';
+            newErrors.assignedTo = 'L\'assignation est requise';
         }
         
         if (!formData.deadline) {
-            newErrors.deadline = 'La date limite est requise';
+            newErrors.deadline = 'La deadline est requise';
         } else {
             const deadlineDate = new Date(formData.deadline);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            if (deadlineDate <= today) {
-                newErrors.deadline = 'La date limite doit être dans le futur';
+            if (deadlineDate < today) {
+                newErrors.deadline = 'La deadline doit être dans le futur';
             }
         }
         
@@ -95,8 +84,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        console.log('Form data being submitted:', formData);
-        
         const formErrors = validateForm();
         if (Object.keys(formErrors).length > 0) {
             setErrors(formErrors);
@@ -105,16 +92,17 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
         try {
             setLoading(true);
+            setIsSubmitting(true);
             
-            if (isEditing) {
+            if (task) {
                 const updatedTask = await taskService.update(task._id, formData);
                 onTaskUpdated?.(updatedTask);
             } else {
                 const createdTask = await taskService.create(formData);
                 onTaskCreated?.(createdTask);
                 
-                // Réinitialiser le formulaire si création
-                if (!isEditing) {
+                // Reset form if creation
+                if (!task) {
                     setFormData({
                         title: '',
                         description: '',
@@ -130,104 +118,232 @@ const TaskForm: React.FC<TaskFormProps> = ({
             setErrors({ general: errorMessage });
         } finally {
             setLoading(false);
+            setIsSubmitting(false);
         }
     };
 
+    const isEditing = !!task;
+
     return (
         <div style={{ 
-            border: '1px solid #ddd', 
-            borderRadius: '8px', 
-            padding: '20px', 
-            marginBottom: '20px',
-            backgroundColor: '#f8f9fa'
+            maxWidth: '600px', 
+            margin: '0 auto', 
+            padding: '20px',
+            backgroundColor: 'var(--card-bg)',
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            border: '1px solid var(--border-color)'
         }}>
-            <h2>{isEditing ? 'Modifier la tâche' : 'Créer une nouvelle tâche'}</h2>
-            
+            <div style={{ marginBottom: '30px', textAlign: 'center' }}>
+                <h2 style={{ 
+                    margin: '0 0 10px 0', 
+                    color: 'var(--text-primary)',
+                    fontSize: '1.8rem',
+                    fontWeight: '600'
+                }}>
+                    {isEditing ? '✏️ Modifier la tâche' : '📝 Créer une nouvelle tâche'}
+                </h2>
+                <p style={{ 
+                    margin: '0', 
+                    color: 'var(--text-secondary)',
+                    fontSize: '1rem'
+                }}>
+                    {isEditing 
+                        ? 'Modifiez les informations de la tâche existante' 
+                        : 'Remplissez le formulaire ci-dessous pour créer une nouvelle tâche'
+                    }
+                </p>
+            </div>
+
             {errors.general && (
                 <div style={{ 
-                    color: 'red', 
                     marginBottom: '20px', 
-                    padding: '10px', 
-                    border: '1px solid #ff6b6b', 
-                    borderRadius: '4px',
-                    backgroundColor: '#ffe6e6'
+                    padding: '15px', 
+                    backgroundColor: 'var(--danger-bg)', 
+                    borderRadius: '8px',
+                    border: '1px solid var(--danger-border)',
+                    color: 'var(--danger-text)',
+                    textAlign: 'center'
                 }}>
                     {errors.general}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Titre:</label>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div>
+                    <label style={{ 
+                        display: 'block', 
+                        marginBottom: '8px', 
+                        fontWeight: '600',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.95rem'
+                    }}>
+                        Titre de la tâche *
+                    </label>
                     <input
                         type="text"
                         name="title"
                         value={formData.title}
                         onChange={handleChange}
-                        maxLength={200}
+                        placeholder="Entrez le titre de la tâche..."
                         style={{
                             width: '100%',
-                            padding: '8px',
-                            border: errors.title ? '1px solid #ff6b6b' : '1px solid #ddd',
-                            borderRadius: '4px'
+                            padding: '12px 16px',
+                            border: errors.title ? '2px solid var(--button-danger)' : '1px solid var(--input-border)',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            backgroundColor: 'var(--input-bg)',
+                            color: 'var(--text-primary)',
+                            transition: 'all 0.2s ease'
                         }}
+                        disabled={isSubmitting}
                     />
                     {errors.title && (
-                        <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+                        <div style={{ 
+                            color: 'var(--button-danger)', 
+                            fontSize: '0.875rem', 
+                            marginTop: '5px',
+                            fontWeight: '500'
+                        }}>
                             {errors.title}
                         </div>
                     )}
                 </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Description:</label>
+                <div>
+                    <label style={{ 
+                        display: 'block', 
+                        marginBottom: '8px', 
+                        fontWeight: '600',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.95rem'
+                    }}>
+                        Description
+                    </label>
                     <textarea
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        maxLength={1000}
+                        placeholder="Décrivez la tâche en détail (optionnel)..."
                         rows={4}
                         style={{
                             width: '100%',
-                            padding: '8px',
-                            border: errors.description ? '1px solid #ff6b6b' : '1px solid #ddd',
-                            borderRadius: '4px',
-                            resize: 'vertical'
+                            padding: '12px 16px',
+                            border: '1px solid var(--input-border)',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            backgroundColor: 'var(--input-bg)',
+                            color: 'var(--text-primary)',
+                            resize: 'vertical',
+                            fontFamily: 'inherit',
+                            transition: 'all 0.2s ease'
                         }}
+                        disabled={isSubmitting}
                     />
                 </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Statut:</label>
-                    <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleChange}
-                        style={{
-                            width: '100%',
-                            padding: '8px',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px'
-                        }}
-                    >
-                        <option value="à faire">À faire</option>
-                        <option value="en cours">En cours</option>
-                        <option value="terminé">Terminé</option>
-                    </select>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div>
+                        <label style={{ 
+                            display: 'block', 
+                            marginBottom: '8px', 
+                            fontWeight: '600',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.95rem'
+                        }}>
+                            Statut
+                        </label>
+                        <select
+                            name="status"
+                            value={formData.status}
+                            onChange={handleChange}
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                border: '1px solid var(--input-border)',
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                backgroundColor: 'var(--input-bg)',
+                                color: 'var(--text-primary)',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                            }}
+                            disabled={isSubmitting}
+                        >
+                            <option value="à faire">📋 À faire</option>
+                            <option value="en cours">⏳ En cours</option>
+                            <option value="terminé">✅ Terminé</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style={{ 
+                            display: 'block', 
+                            marginBottom: '8px', 
+                            fontWeight: '600',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.95rem'
+                        }}>
+                            Deadline *
+                        </label>
+                        <input
+                            type="date"
+                            name="deadline"
+                            value={formData.deadline}
+                            onChange={handleChange}
+                            min={new Date().toISOString().split('T')[0]}
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                border: errors.deadline ? '2px solid var(--button-danger)' : '1px solid var(--input-border)',
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                backgroundColor: 'var(--input-bg)',
+                                color: 'var(--text-primary)',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                            }}
+                            disabled={isSubmitting}
+                        />
+                        {errors.deadline && (
+                            <div style={{ 
+                                color: 'var(--button-danger)', 
+                                fontSize: '0.875rem', 
+                                marginTop: '5px',
+                                fontWeight: '500'
+                            }}>
+                                {errors.deadline}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Assigné à:</label>
+                <div>
+                    <label style={{ 
+                        display: 'block', 
+                        marginBottom: '8px', 
+                        fontWeight: '600',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.95rem'
+                    }}>
+                        Assigné à *
+                    </label>
                     <select
                         name="assignedTo"
                         value={formData.assignedTo}
                         onChange={handleChange}
                         style={{
                             width: '100%',
-                            padding: '8px',
-                            border: errors.assignedTo ? '1px solid #ff6b6b' : '1px solid #ddd',
-                            borderRadius: '4px'
+                            padding: '12px 16px',
+                            border: errors.assignedTo ? '2px solid var(--button-danger)' : '1px solid var(--input-border)',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            backgroundColor: 'var(--input-bg)',
+                            color: 'var(--text-primary)',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
                         }}
+                        disabled={isSubmitting}
                     >
                         <option value="">Sélectionner un utilisateur</option>
                         {users.map(user => (
@@ -237,71 +353,75 @@ const TaskForm: React.FC<TaskFormProps> = ({
                         ))}
                     </select>
                     {users.length === 0 && (
-                        <div style={{ color: '#666', fontSize: '12px', marginTop: '5px' }}>
+                        <div style={{ 
+                            color: 'var(--text-secondary)', 
+                            fontSize: '0.875rem', 
+                            marginTop: '5px',
+                            fontStyle: 'italic'
+                        }}>
                             Chargement des utilisateurs...
                         </div>
                     )}
                     {errors.assignedTo && (
-                        <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+                        <div style={{ 
+                            color: 'var(--button-danger)', 
+                            fontSize: '0.875rem', 
+                            marginTop: '5px',
+                            fontWeight: '500'
+                        }}>
                             {errors.assignedTo}
                         </div>
                     )}
                 </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Date limite:</label>
-                    <input
-                        type="date"
-                        name="deadline"
-                        value={formData.deadline}
-                        onChange={handleChange}
-                        min={new Date().toISOString().split('T')[0]}
-                        style={{
-                            width: '100%',
-                            padding: '8px',
-                            border: errors.deadline ? '1px solid #ff6b6b' : '1px solid #ddd',
-                            borderRadius: '4px'
-                        }}
-                    />
-                    {errors.deadline && (
-                        <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
-                            {errors.deadline}
-                        </div>
-                    )}
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        style={{
-                            padding: '10px 20px',
-                            backgroundColor: loading ? '#ccc' : '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: loading ? 'not-allowed' : 'pointer'
-                        }}
-                    >
-                        {loading ? 'Sauvegarde...' : (isEditing ? 'Mettre à jour' : 'Créer')}
-                    </button>
-
-                    {isEditing && onCancel && (
+                <div style={{ 
+                    display: 'flex', 
+                    gap: '12px', 
+                    justifyContent: 'flex-end',
+                    marginTop: '10px'
+                }}>
+                    {onCancel && (
                         <button
                             type="button"
                             onClick={onCancel}
+                            disabled={isSubmitting}
                             style={{
-                                padding: '10px 20px',
-                                backgroundColor: '#6c757d',
+                                padding: '12px 24px',
+                                backgroundColor: 'var(--button-secondary)',
                                 color: 'white',
                                 border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer'
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                fontWeight: '500',
+                                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                                transition: 'all 0.2s ease'
                             }}
                         >
                             Annuler
                         </button>
                     )}
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        style={{
+                            padding: '12px 24px',
+                            backgroundColor: isSubmitting ? 'var(--text-muted)' : 'var(--button-primary)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            fontWeight: '500',
+                            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                            transition: 'all 0.2s ease',
+                            minWidth: '120px'
+                        }}
+                    >
+                        {isSubmitting ? (
+                            <span>⏳ {isEditing ? 'Modification...' : 'Création...'}</span>
+                        ) : (
+                            <span>{isEditing ? '✏️ Modifier' : '📝 Créer'}</span>
+                        )}
+                    </button>
                 </div>
             </form>
         </div>

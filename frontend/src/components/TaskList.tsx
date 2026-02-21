@@ -78,11 +78,20 @@ const TaskList: React.FC = () => {
         setEditingTask(null);
     };
 
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'terminé': return '✅';
+            case 'en cours': return '⏳';
+            case 'à faire': return '📋';
+            default: return '❓';
+        }
+    };
+
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'à faire': return '#ffc107';
-            case 'en cours': return '#17a2b8';
             case 'terminé': return '#28a745';
+            case 'en cours': return '#ffc107';
+            case 'à faire': return '#dc3545';
             default: return '#6c757d';
         }
     };
@@ -142,53 +151,61 @@ const TaskList: React.FC = () => {
                     {filteredTasks.map(task => (
                         <div
                             key={task._id}
-                            style={{
-                                border: '1px solid #ddd',
-                                borderRadius: '8px',
-                                padding: '15px',
-                                marginBottom: '15px',
-                                backgroundColor: '#f8f9fa'
-                            }}
+                            className={`card card-status ${task.status.replace(' ', '-').replace('é', 'e')} card-hover`}
                         >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div style={{ flex: 1 }}>
-                                    <h3 style={{ margin: '0 0 10px 0' }}>{task.title}</h3>
-                                    {task.description && (
-                                        <p style={{ margin: '0 0 10px 0', color: '#666' }}>{task.description}</p>
-                                    )}
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '14px' }}>
-                                        <span>
-                                            Assigné à: <strong>{task.assignedTo?.username}</strong>
-                                        </span>
-                                        <span>
-                                            Créé par: <strong>{task.createdBy?.username}</strong>
-                                        </span>
-                                        <span
-                                            className={`badge status-${task.status.replace(' ', '-').replace('é', 'e')}`}
-                                            style={{
-                                                backgroundColor: getStatusColor(task.status),
-                                                color: task.status === 'en cours' ? '#000' : 'white',
-                                                padding: '2px 8px',
-                                                borderRadius: '12px',
-                                                fontSize: '12px',
-                                                fontWeight: 'bold'
-                                            }}
-                                        >
-                                            {task.status}
-                                        </span>
+                            <div className="card-header">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div className={`card-icon ${task.status === 'terminé' ? 'success' : task.status === 'en cours' ? 'warning' : 'danger'}`}>
+                                        {getStatusIcon(task.status)}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <h3 className="card-title">{task.title}</h3>
+                                        {task.description && (
+                                            <p className="card-subtitle">{task.description.substring(0, 100)}
+                                                {task.description.length > 100 && '...'}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
-                                
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginLeft: '20px' }}>
+                                <div className={`card-badge ${task.status.replace(' ', '-').replace('é', 'e')}`}>
+                                    {task.status}
+                                </div>
+                            </div>
+                            
+                            <div className="card-content">
+                                <div className="card-metrics">
+                                    <div className="card-metric">
+                                        <div className="card-metric-value">
+                                            {task.assignedTo?.username || 'N/A'}
+                                        </div>
+                                        <div className="card-metric-label">Assigné à</div>
+                                    </div>
+                                    <div className="card-metric">
+                                        <div className="card-metric-value">
+                                            {task.createdBy?.username || 'N/A'}
+                                        </div>
+                                        <div className="card-metric-label">Créé par</div>
+                                    </div>
+                                    {task.deadline && (
+                                        <div className="card-metric">
+                                            <div className="card-metric-value">
+                                                {new Date(task.deadline).toLocaleDateString('fr-FR')}
+                                            </div>
+                                            <div className="card-metric-label">Deadline</div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            <div className="card-footer">
+                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                                    Créée le {new Date(task.createdAt).toLocaleDateString('fr-FR')}
+                                </div>
+                                <div className="card-actions">
                                     <select
                                         value={task.status}
                                         onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                                        style={{
-                                            padding: '5px',
-                                            borderRadius: '4px',
-                                            border: '1px solid #ddd',
-                                            fontSize: '12px'
-                                        }}
+                                        className="card-action secondary"
                                     >
                                         <option value="à faire">À faire</option>
                                         <option value="en cours">En cours</option>
@@ -197,32 +214,16 @@ const TaskList: React.FC = () => {
                                     
                                     <button
                                         onClick={() => handleEditTask(task)}
-                                        style={{
-                                            padding: '5px 10px',
-                                            backgroundColor: '#007bff',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer',
-                                            fontSize: '12px'
-                                        }}
+                                        className="card-action primary"
                                     >
-                                        Modifier
+                                        ✏️ Modifier
                                     </button>
                                     
                                     <button
                                         onClick={() => handleDeleteTask(task._id)}
-                                        style={{
-                                            padding: '5px 10px',
-                                            backgroundColor: '#dc3545',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer',
-                                            fontSize: '12px'
-                                        }}
+                                        className="card-action danger"
                                     >
-                                        Supprimer
+                                        🗑️ Supprimer
                                     </button>
                                 </div>
                             </div>

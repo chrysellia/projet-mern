@@ -1,47 +1,47 @@
 /* Variables CSS pour les thèmes */
 :root {
-  /* Thème Light */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --bg-tertiary: #e9ecef;
-  --text-primary: #212529;
-  --text-secondary: #6c757d;
-  --text-muted: #adb5bd;
-  --border-color: #dee2e6;
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  --shadow-hover: rgba(0, 0, 0, 0.15);
+  /* Thème Light - Amélioré */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --text-primary: #1a202c;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --shadow-color: rgba(0, 0, 0, 0.05);
+  --shadow-hover: rgba(0, 0, 0, 0.1);
   --card-bg: #ffffff;
-  --card-border: #dee2e6;
-  --button-primary: #007bff;
-  --button-primary-hover: #0056b3;
-  --button-secondary: #6c757d;
-  --button-secondary-hover: #545b62;
-  --button-success: #28a745;
-  --button-success-hover: #218838;
-  --button-danger: #dc3545;
-  --button-danger-hover: #c82333;
-  --button-warning: #ffc107;
-  --button-warning-hover: #e0a800;
+  --card-border: #e2e8f0;
+  --button-primary: #3b82f6;
+  --button-primary-hover: #2563eb;
+  --button-secondary: #64748b;
+  --button-secondary-hover: #475569;
+  --button-success: #10b981;
+  --button-success-hover: #059669;
+  --button-danger: #ef4444;
+  --button-danger-hover: #dc2626;
+  --button-warning: #f59e0b;
+  --button-warning-hover: #d97706;
   --input-bg: #ffffff;
-  --input-border: #ced4da;
-  --input-focus: #80bdff;
+  --input-border: #d1d5db;
+  --input-focus: #3b82f6;
   --modal-bg: #ffffff;
   --modal-overlay: rgba(0, 0, 0, 0.5);
-  --code-bg: #f8f9fa;
-  --code-border: #e9ecef;
-  --code-text: #d63384;
-  --success-bg: #d4edda;
-  --success-border: #c3e6cb;
-  --success-text: #155724;
-  --warning-bg: #fff3cd;
-  --warning-border: #ffeaa7;
-  --warning-text: #856404;
-  --danger-bg: #f8d7da;
-  --danger-border: #f5c6cb;
-  --danger-text: #721c24;
-  --info-bg: #d1ecf1;
-  --info-border: #bee5eb;
-  --info-text: #0c5460;
+  --code-bg: #f8fafc;
+  --code-border: #e2e8f0;
+  --code-text: #ef4444;
+  --success-bg: #f0fdf4;
+  --success-border: #86efac;
+  --success-text: #166534;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #92400e;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-text: #991b1b;
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --info-text: #0369a1;
 }
 
 [data-theme="dark"] {
