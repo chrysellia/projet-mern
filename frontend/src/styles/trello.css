@@ -293,6 +293,14 @@
   border-left: 4px solid #28a745;
 }
 
+.trello-column.admin {
+  border-left: 4px solid #6f42c1;
+}
+
+.trello-column.user {
+  border-left: 4px solid #17a2b8;
+}
+
 .trello-column.à-faire .trello-column-title {
   color: #dc3545;
 }
@@ -303,6 +311,14 @@
 
 .trello-column.terminé .trello-column-title {
   color: #28a745;
+}
+
+.trello-column.admin .trello-column-title {
+  color: #6f42c1;
+}
+
+.trello-column.user .trello-column-title {
+  color: #17a2b8;
 }
 
 /* Deadline dans les cartes */
