@@ -32,7 +32,7 @@ const UserManagement: React.FC = () => {
         if (window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
             try {
                 await userService.delete(userId);
-                setUsers(users.filter(user => user.id !== userId));
+                setUsers(users.filter(user => user._id !== userId));
             } catch (error: any) {
                 setError('Erreur lors de la suppression de l\'utilisateur');
                 console.error('Error deleting user:', error);
@@ -46,7 +46,7 @@ const UserManagement: React.FC = () => {
 
     const handleUserUpdated = (updatedUser: User) => {
         setUsers(users.map(user => 
-            user.id === updatedUser.id ? updatedUser : user
+            user._id === updatedUser._id ? updatedUser : user
         ));
         setEditingUser(null);
     };
@@ -90,7 +90,7 @@ const UserManagement: React.FC = () => {
                 <div>
                     {users.map(user => (
                         <div
-                            key={user.id}
+                            key={user._id}
                             style={{
                                 border: '1px solid #ddd',
                                 borderRadius: '8px',
@@ -139,9 +139,9 @@ const UserManagement: React.FC = () => {
                                         Modifier
                                     </button>
                                     
-                                    {user.id !== currentUser?.id && (
+                                    {user._id !== currentUser?._id && (
                                         <button
-                                            onClick={() => handleDeleteUser(user.id)}
+                                            onClick={() => handleDeleteUser(user._id)}
                                             style={{
                                                 padding: '8px 16px',
                                                 backgroundColor: '#dc3545',
@@ -219,7 +219,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onUserUpdated, onCancel }) =>
         try {
             setLoading(true);
             
-            const updatedUser = await userService.update(user.id, formData);
+            const updatedUser = await userService.update(user._id, formData);
             onUserUpdated(updatedUser);
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Erreur lors de la mise à jour de l\'utilisateur';

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AuthResponse, LoginData, RegisterData, Task, TaskFormData, User } from '../types';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5001/api';
 
 // Créer une instance axios avec configuration par défaut
 const api = axios.create({

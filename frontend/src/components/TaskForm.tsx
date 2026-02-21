@@ -34,7 +34,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 title: task.title,
                 description: task.description || '',
                 status: task.status,
-                assignedTo: task.assignedTo.id
+                assignedTo: task.assignedTo._id
             });
         }
     }, [task, isEditing]);
@@ -115,7 +115,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
     const availableUsers = user?.role === 'admin' 
         ? users 
-        : users.filter(u => u.id === user?.id);
+        : users.filter(u => u._id === user?._id);
 
     return (
         <div style={{ 
@@ -215,7 +215,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
                     >
                         <option value="">Sélectionner un utilisateur</option>
                         {availableUsers.map(user => (
-                            <option key={user.id} value={user.id}>
+                            <option key={user._id} value={user._id}>
                                 {user.username} ({user.email})
                             </option>
                         ))}

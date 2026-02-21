@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const User = require('../models/User');
 const Joi = require('joi');
@@ -94,7 +95,19 @@ router.post('/', protect, async (req, res) => {
         const { title, description, status, assignedTo } = req.body;
 
         // Check if assigned user exists
-        const assignedUser = await User.findById(assignedTo);
+        let assignedUser;
+        try {
+            // Si c'est une chaîne, essayer de convertir en ObjectId
+            if (mongoose.Types.ObjectId.isValid(assignedTo)) {
+                assignedUser = await User.findById(assignedTo);
+            } else {
+                // Chercher par email comme fallback
+                assignedUser = await User.findOne({ email: assignedTo });
+            }
+        } catch (error) {
+            return res.status(400).json({ message: 'Invalid assigned user ID' });
+        }
+        
         if (!assignedUser) {
             return res.status(400).json({ message: 'Assigned user not found' });
         }
@@ -108,7 +121,7 @@ router.post('/', protect, async (req, res) => {
             title,
             description,
             status,
-            assignedTo,
+            assignedTo: assignedUser._id, // Utiliser l'ObjectId réel
             createdBy: req.user._id
         });
 
@@ -141,6 +154,12 @@ router.put('/:id', protect, async (req, res) => {
 
         const { id } = req.params;
         const updates = req.body;
+        
+        console.log('🔍 DEBUG PUT Request:');
+        console.log('Task ID:', id);
+        console.log('Updates:', updates);
+        console.log('AssignedTo value:', updates.assignedTo);
+        console.log('Type of assignedTo:', typeof updates.assignedTo);
 
         const task = await Task.findById(id);
         if (!task) {
@@ -158,7 +177,31 @@ router.put('/:id', protect, async (req, res) => {
 
         // If updating assignedTo, check if user exists and permissions
         if (updates.assignedTo) {
-            const assignedUser = await User.findById(updates.assignedTo);
+            let assignedUser;
+            try {
+                // Si c'est une chaîne, essayer de convertir en ObjectId
+                if (mongoose.Types.ObjectId.isValid(updates.assignedTo)) {
+                    assignedUser = await User.findById(updates.assignedTo);
+                } else {
+                    // Vérifier si c'est un email (contient @)
+                    if (updates.assignedTo.includes('@')) {
+                        // Chercher par email avec aggregation pour éviter les problèmes de casting
+                        const users = await User.aggregate([
+                            { $match: { email: updates.assignedTo } }
+                        ]);
+                        assignedUser = users[0];
+                    } else {
+                        // C'est probablement un username, chercher par username avec aggregation
+                        const users = await User.aggregate([
+                            { $match: { username: updates.assignedTo } }
+                        ]);
+                        assignedUser = users[0];
+                    }
+                }
+            } catch (error) {
+                return res.status(400).json({ message: 'Invalid assigned user ID' });
+            }
+            
             if (!assignedUser) {
                 return res.status(400).json({ message: 'Assigned user not found' });
             }
@@ -172,6 +215,9 @@ router.put('/:id', protect, async (req, res) => {
             if (!isAdmin && updates.assignedTo !== req.user._id.toString()) {
                 return res.status(403).json({ message: 'You can only assign tasks to yourself' });
             }
+
+            // Utiliser l'ObjectId réel pour la mise à jour
+            updates.assignedTo = assignedUser._id;
         }
 
         const updatedTask = await Task.findByIdAndUpdate(
