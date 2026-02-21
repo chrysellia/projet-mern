@@ -39,19 +39,22 @@ const Dashboard: React.FC = () => {
                 justifyContent: 'space-between', 
                 alignItems: 'center', 
                 marginBottom: '30px',
-                borderBottom: '1px solid #ddd',
-                paddingBottom: '10px'
+                padding: '20px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '8px'
             }}>
                 <div>
-                    <h1 style={{ margin: 0, color: '#333' }}>Tableau de bord</h1>
-                    <p style={{ margin: '5px 0 0 0', color: '#666' }}>
-                        Bienvenue, {user?.username}! ({user?.role})
+                    <h1 style={{ margin: '0 0 10px 0', color: '#333' }}>
+                        Tableau de bord
+                    </h1>
+                    <p style={{ margin: '0', color: '#666' }}>
+                        Bienvenue, {user?.username} ({user?.role})
                     </p>
                 </div>
                 <button
                     onClick={handleLogout}
                     style={{
-                        padding: '8px 16px',
+                        padding: '10px 20px',
                         backgroundColor: '#dc3545',
                         color: 'white',
                         border: 'none',
@@ -61,22 +64,6 @@ const Dashboard: React.FC = () => {
                 >
                     Déconnexion
                 </button>
-                {user?.role === 'admin' && (
-                    <button
-                        onClick={() => setActiveTab('users')}
-                        style={{
-                            marginRight: '10px',
-                            padding: '10px 20px',
-                            backgroundColor: activeTab === 'users' ? '#007bff' : '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Gérer les utilisateurs
-                    </button>
-                )}
             </header>
 
             <div style={{ marginBottom: '20px' }}>
@@ -87,19 +74,23 @@ const Dashboard: React.FC = () => {
                     Tâches
                 </button>
                 
-                <button
-                    onClick={() => setActiveTab('create')}
-                    style={getTabStyle('create')}
-                >
-                    Créer une tâche
-                </button>
+                {user?.role === 'admin' && (
+                    <button
+                        onClick={() => setActiveTab('create')}
+                        style={getTabStyle('create')}
+                    >
+                        Créer une tâche
+                    </button>
+                )}
 
-                <button
-                    onClick={() => setActiveTab('users')}
-                    style={getTabStyle('users')}
-                >
-                    {user?.role === 'admin' ? 'Gérer les utilisateurs' : 'Voir les utilisateurs'}
-                </button>
+                {user?.role === 'admin' && (
+                    <button
+                        onClick={() => setActiveTab('users')}
+                        style={getTabStyle('users')}
+                    >
+                        Gérer les utilisateurs
+                    </button>
+                )}
             </div>
 
             <div>
@@ -111,7 +102,7 @@ const Dashboard: React.FC = () => {
                     <TaskForm onTaskCreated={handleTaskCreated} />
                 )}
 
-                {activeTab === 'users' && (
+                {activeTab === 'users' && user?.role === 'admin' && (
                     <UserManagement refreshTasks={refreshTasks} />
                 )}
             </div>

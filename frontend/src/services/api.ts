@@ -17,6 +17,9 @@ api.interceptors.request.use(
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log('Adding token to request:', token.substring(0, 20) + '...');
+        } else {
+            console.log('No token found in localStorage');
         }
         return config;
     },
@@ -95,7 +98,9 @@ export const taskService = {
 // Services des utilisateurs
 export const userService = {
     getAll: async (): Promise<User[]> => {
+        console.log('Making request to /users...');
         const response = await api.get('/users');
+        console.log('Response from /users:', response.data);
         return response.data;
     },
 

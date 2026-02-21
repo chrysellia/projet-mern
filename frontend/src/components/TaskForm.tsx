@@ -45,7 +45,9 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
     const fetchUsers = async () => {
         try {
+            console.log('Fetching users...');
             const fetchedUsers = await userService.getAll();
+            console.log('Fetched users:', fetchedUsers);
             setUsers(fetchedUsers);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -112,10 +114,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
             setLoading(false);
         }
     };
-
-    const availableUsers = user?.role === 'admin' 
-        ? users 
-        : users.filter(u => u._id === user?._id);
 
     return (
         <div style={{ 
@@ -214,12 +212,17 @@ const TaskForm: React.FC<TaskFormProps> = ({
                         }}
                     >
                         <option value="">Sélectionner un utilisateur</option>
-                        {availableUsers.map(user => (
+                        {users.map(user => (
                             <option key={user._id} value={user._id}>
                                 {user.username} ({user.email})
                             </option>
                         ))}
                     </select>
+                    {users.length === 0 && (
+                        <div style={{ color: '#666', fontSize: '12px', marginTop: '5px' }}>
+                            Chargement des utilisateurs...
+                        </div>
+                    )}
                     {errors.assignedTo && (
                         <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
                             {errors.assignedTo}
