@@ -20,7 +20,8 @@ const TaskForm: React.FC<TaskFormProps> = ({
         title: '',
         description: '',
         status: 'à faire',
-        assignedTo: ''
+        assignedTo: '',
+        deadline: ''
     });
     const [users, setUsers] = useState<User[]>([]);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -34,7 +35,8 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 title: task.title,
                 description: task.description || '',
                 status: task.status,
-                assignedTo: task.assignedTo._id
+                assignedTo: task.assignedTo._id,
+                deadline: task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : ''
             });
         }
     }, [task, isEditing]);
@@ -75,11 +77,25 @@ const TaskForm: React.FC<TaskFormProps> = ({
             newErrors.assignedTo = 'Veuillez assigner cette tâche à quelqu\'un';
         }
         
+        if (!formData.deadline) {
+            newErrors.deadline = 'La date limite est requise';
+        } else {
+            const deadlineDate = new Date(formData.deadline);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (deadlineDate <= today) {
+                newErrors.deadline = 'La date limite doit être dans le futur';
+            }
+        }
+        
         return newErrors;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        console.log('Form data being submitted:', formData);
         
         const formErrors = validateForm();
         if (Object.keys(formErrors).length > 0) {
@@ -103,11 +119,13 @@ const TaskForm: React.FC<TaskFormProps> = ({
                         title: '',
                         description: '',
                         status: 'à faire',
-                        assignedTo: ''
+                        assignedTo: '',
+                        deadline: ''
                     });
                 }
             }
         } catch (error: any) {
+            console.error('Submit error:', error);
             const errorMessage = error.response?.data?.message || 'Erreur lors de la sauvegarde de la tâche';
             setErrors({ general: errorMessage });
         } finally {
@@ -226,6 +244,28 @@ const TaskForm: React.FC<TaskFormProps> = ({
                     {errors.assignedTo && (
                         <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
                             {errors.assignedTo}
+                        </div>
+                    )}
+                </div>
+
+                <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Date limite:</label>
+                    <input
+                        type="date"
+                        name="deadline"
+                        value={formData.deadline}
+                        onChange={handleChange}
+                        min={new Date().toISOString().split('T')[0]}
+                        style={{
+                            width: '100%',
+                            padding: '8px',
+                            border: errors.deadline ? '1px solid #ff6b6b' : '1px solid #ddd',
+                            borderRadius: '4px'
+                        }}
+                    />
+                    {errors.deadline && (
+                        <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+                            {errors.deadline}
                         </div>
                     )}
                 </div>

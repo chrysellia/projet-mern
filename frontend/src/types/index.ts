@@ -14,6 +14,9 @@ export interface Task {
     status: 'à faire' | 'en cours' | 'terminé';
     assignedTo: User;
     createdBy: User;
+    deadline: string;
+    notified: boolean;
+    reminderSent: boolean;
     createdAt: string;
     updatedAt: string;
 }
@@ -41,6 +44,7 @@ export interface TaskFormData {
     description?: string;
     status: 'à faire' | 'en cours' | 'terminé';
     assignedTo: string;
+    deadline: string;
 }
 
 export interface ApiResponse<T> {

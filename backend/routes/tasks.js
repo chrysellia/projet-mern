@@ -12,14 +12,16 @@ const createTaskSchema = Joi.object({
     title: Joi.string().max(200).required(),
     description: Joi.string().max(1000).allow(''),
     status: Joi.string().valid('à faire', 'en cours', 'terminé').default('à faire'),
-    assignedTo: Joi.string().required()
+    assignedTo: Joi.string().required(),
+    deadline: Joi.date().required().min('now')
 });
 
 const updateTaskSchema = Joi.object({
     title: Joi.string().max(200),
     description: Joi.string().max(1000).allow(''),
     status: Joi.string().valid('à faire', 'en cours', 'terminé'),
-    assignedTo: Joi.string()
+    assignedTo: Joi.string(),
+    deadline: Joi.date().min('now').optional()
 });
 
 // @route   GET /api/tasks
@@ -86,13 +88,17 @@ router.get('/:id', protect, async (req, res) => {
 // @access  Private
 router.post('/', protect, async (req, res) => {
     try {
+        console.log('🔍 DEBUG POST Request - Request body:', req.body);
+        
         // Validate input
         const { error } = createTaskSchema.validate(req.body);
         if (error) {
+            console.log('❌ Validation error:', error.details[0].message);
             return res.status(400).json({ message: error.details[0].message });
         }
 
-        const { title, description, status, assignedTo } = req.body;
+        const { title, description, status, assignedTo, deadline } = req.body;
+        console.log('✅ Validation passed. Extracted data:', { title, description, status, assignedTo, deadline });
 
         // Check if assigned user exists
         let assignedUser;
@@ -122,7 +128,8 @@ router.post('/', protect, async (req, res) => {
             description,
             status,
             assignedTo: assignedUser._id, // Utiliser l'ObjectId réel
-            createdBy: req.user._id
+            createdBy: req.user._id,
+            deadline
         });
 
         await task.save();

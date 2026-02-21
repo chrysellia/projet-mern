@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+// const { startCronJobs } = require('./utils/cronJobs'); // Temporairement désactivé
 
 // Load environment variables
 dotenv.config();
@@ -15,7 +16,12 @@ app.use(express.json());
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('✅ Connected to MongoDB'))
+    .then(() => {
+        console.log('✅ Connected to MongoDB');
+        // Démarrer les cron jobs après la connexion à la base de données
+        // startCronJobs(); // Temporairement désactivé
+        console.log('⚠️ Cron jobs désactivés temporairement');
+    })
     .catch((err) => {
         console.error('❌ MongoDB connection error:', err);
         process.exit(1);
@@ -25,6 +31,7 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/tasks', require('./routes/tasks'));
+// app.use('/api/notifications', require('./routes/notifications')); // Temporairement désactivé
 
 // Health check endpoint
 app.get('/health', (req, res) => {

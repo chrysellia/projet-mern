@@ -76,7 +76,9 @@ export const taskService = {
     },
 
     create: async (taskData: TaskFormData): Promise<Task> => {
+        console.log('Creating task with data:', taskData);
         const response = await api.post('/tasks', taskData);
+        console.log('Task creation response:', response.data);
         return response.data.task;
     },
 

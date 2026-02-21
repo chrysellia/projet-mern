@@ -26,6 +26,24 @@ const taskSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: [true, 'Task must have a creator']
+    },
+    deadline: {
+        type: Date,
+        required: [true, 'Task must have a deadline'],
+        validate: {
+            validator: function(value) {
+                return value > new Date();
+            },
+            message: 'Deadline must be in the future'
+        }
+    },
+    notified: {
+        type: Boolean,
+        default: false
+    },
+    reminderSent: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
