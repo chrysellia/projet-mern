@@ -17,6 +17,109 @@
   color: inherit !important;
 }
 
+/* Garder les couleurs des statuts même en mode dark */
+[data-theme="dark"] [data-status="à faire"],
+[data-theme="dark"] .status-à-faire,
+[data-theme="dark"] .status-todo,
+[data-theme="dark"] .status-pending {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+[data-theme="dark"] [data-status="en cours"],
+[data-theme="dark"] .status-en-cours,
+[data-theme="dark"] .status-in-progress,
+[data-theme="dark"] .status-progress {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+[data-theme="dark"] [data-status="terminé"],
+[data-theme="dark"] .status-terminé,
+[data-theme="dark"] .status-completed,
+[data-theme="dark"] .status-done {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+/* Forcer les badges de statut colorés même avec !important */
+[data-theme="dark"] .badge[data-status="à faire"],
+[data-theme="dark"] .badge[data-status="en cours"],
+[data-theme="dark"] .badge[data-status="terminé"] {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+[data-theme="dark"] .badge[data-status="à faire"] {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+[data-theme="dark"] .badge[data-status="en cours"] {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+[data-theme="dark"] .badge[data-status="terminé"] {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+/* Forcer les spans et badges avec classes de statut */
+[data-theme="dark"] span[data-status="à faire"],
+[data-theme="dark"] span[data-status="en cours"],
+[data-theme="dark"] span[data-status="terminé"] {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+[data-theme="dark"] span[data-status="à faire"] {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+[data-theme="dark"] span[data-status="en cours"] {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+[data-theme="dark"] span[data-status="terminé"] {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+/* Forcer les éléments avec inline styles de statut */
+[data-theme="dark"] [style*="background-color: #28a745"],
+[data-theme="dark"] [style*="background-color:#28a745"] {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+[data-theme="dark"] [style*="background-color:#dc3545"],
+[data-theme="dark"] [style*="background-color: #dc3545"] {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+[data-theme="dark"] [style*="background-color:#ffc107"],
+[data-theme="dark"] [style*="background-color: #ffc107"] {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+/* Forcer les éléments avec style contenant "terminé" */
+[data-theme="dark"] [style*="terminé"] {
+  color: #28a745 !important;
+}
+
+[data-theme="dark"] [style*="completed"] {
+  color: #28a745 !important;
+}
+
+[data-theme="dark"] [style*="done"] {
+  color: #28a745 !important;
+}
+
 [data-theme="dark"] div,
 [data-theme="dark"] section,
 [data-theme="dark"] article,

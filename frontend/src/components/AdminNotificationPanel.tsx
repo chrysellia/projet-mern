@@ -166,6 +166,22 @@ const AdminNotificationPanel: React.FC<AdminNotificationPanelProps> = ({ refresh
         return 'Légèrement en retard';
     };
 
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'terminé': return '#28a745';
+            case 'en cours': return '#ffc107';
+            case 'à faire': return '#dc3545';
+            default: return '#6c757d';
+        }
+    };
+
+    const getStatusTextColor = (status: string) => {
+        switch (status) {
+            case 'en cours': return '#000';
+            default: return '#fff';
+        }
+    };
+
     if (loading) {
         return (
             <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -269,7 +285,7 @@ const AdminNotificationPanel: React.FC<AdminNotificationPanelProps> = ({ refresh
                                     <div style={{ 
                                         padding: '8px 12px', 
                                         backgroundColor: getSeverityColor(task.daysOverdue), 
-                                        color: 'white', 
+                                        color: task.status === 'en cours' ? '#000' : 'white', 
                                         borderRadius: '4px',
                                         fontSize: '12px',
                                         fontWeight: 'bold',

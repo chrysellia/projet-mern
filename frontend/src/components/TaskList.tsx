@@ -164,12 +164,14 @@ const TaskList: React.FC = () => {
                                             Créé par: <strong>{task.createdBy?.username}</strong>
                                         </span>
                                         <span
+                                            className={`badge status-${task.status.replace(' ', '-').replace('é', 'e')}`}
                                             style={{
                                                 backgroundColor: getStatusColor(task.status),
-                                                color: 'white',
+                                                color: task.status === 'en cours' ? '#000' : 'white',
                                                 padding: '2px 8px',
                                                 borderRadius: '12px',
-                                                fontSize: '12px'
+                                                fontSize: '12px',
+                                                fontWeight: 'bold'
                                             }}
                                         >
                                             {task.status}

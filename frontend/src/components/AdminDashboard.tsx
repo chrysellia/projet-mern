@@ -97,6 +97,13 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
+    const getStatusTextColor = (status: string) => {
+        switch (status) {
+            case 'en cours': return '#000';
+            default: return '#fff';
+        }
+    };
+
     const getStatusIcon = (status: string) => {
         switch (status) {
             case 'terminé': return '✅';
@@ -625,7 +632,7 @@ const AdminDashboard: React.FC = () => {
                                         <div style={{
                                             padding: '4px 8px',
                                             backgroundColor: getStatusColor(task.status),
-                                            color: 'white',
+                                            color: getStatusTextColor(task.status),
                                             borderRadius: '12px',
                                             fontSize: '12px',
                                             fontWeight: 'bold'
