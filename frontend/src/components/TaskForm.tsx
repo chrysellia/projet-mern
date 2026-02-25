@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Task, TaskFormData, User } from '../types';
 import { taskService, userService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import '../styles/themes.css';
 
 interface TaskFormProps {
@@ -11,6 +12,7 @@ interface TaskFormProps {
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({ task, onTaskCreated, onTaskUpdated, onCancel }) => {
+    const { user } = useAuth();
     const [formData, setFormData] = useState<TaskFormData>({
         title: '',
         description: '',
@@ -23,18 +25,14 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onTaskCreated, onTaskUpdated,
     const [loading, setLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    useEffect(() => {
-        fetchUsers();
-        if (task) {
-            setFormData({
-                title: task.title,
-                description: task.description || '',
-                status: task.status,
-                assignedTo: task.assignedTo._id,
-                deadline: task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : ''
-            });
-        }
-    }, [task]);
+    // Vérifier si l'utilisateur est admin
+    const isAdmin = user?.role === 'admin';
+    
+    // Vérifier si l'utilisateur peut modifier cette tâche
+    const canEditTask = isAdmin || (task && task.assignedTo._id === user?._id);
+    
+    // Vérifier si l'utilisateur peut changer l'assignation
+    const canChangeAssignment = isAdmin;
 
     const fetchUsers = async () => {
         try {
@@ -44,6 +42,25 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onTaskCreated, onTaskUpdated,
             console.error('Error fetching users:', error);
         }
     };
+
+    useEffect(() => {
+        // Seuls les admins ont besoin de la liste des utilisateurs pour l'assignation
+        if (isAdmin) {
+            fetchUsers();
+        }
+        if (task) {
+            setFormData({
+                title: task.title,
+                description: task.description || '',
+                status: task.status,
+                assignedTo: task.assignedTo._id,
+                deadline: task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : ''
+            });
+        } else if (!isAdmin) {
+            // Si c'est un utilisateur qui crée une tâche, l'assigner à lui-même
+            setFormData(prev => ({ ...prev, assignedTo: user?._id || '' }));
+        }
+    }, [task, isAdmin, user?._id]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -107,7 +124,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onTaskCreated, onTaskUpdated,
                         title: '',
                         description: '',
                         status: 'à faire',
-                        assignedTo: '',
+                        assignedTo: !isAdmin ? user?._id || '' : '',
                         deadline: ''
                     });
                 }
@@ -123,6 +140,54 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onTaskCreated, onTaskUpdated,
     };
 
     const isEditing = !!task;
+
+    // Vérifier si l'utilisateur a le droit d'accéder à ce formulaire
+    if (task && !canEditTask) {
+        return (
+            <div style={{ 
+                maxWidth: '600px', 
+                margin: '0 auto', 
+                padding: '20px',
+                backgroundColor: 'var(--card-bg)',
+                borderRadius: '16px',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                border: '1px solid var(--border-color)',
+                textAlign: 'center'
+            }}>
+                <h2 style={{ 
+                    margin: '0 0 20px 0', 
+                    color: 'var(--text-primary)',
+                    fontSize: '1.5rem'
+                }}>
+                    🚫 Accès refusé
+                </h2>
+                <p style={{ 
+                    margin: '0', 
+                    color: 'var(--text-secondary)',
+                    fontSize: '1rem'
+                }}>
+                    Vous n'avez pas l'autorisation de modifier cette tâche.
+                </p>
+                {onCancel && (
+                    <button
+                        onClick={onCancel}
+                        style={{
+                            marginTop: '20px',
+                            padding: '12px 24px',
+                            backgroundColor: 'var(--button-secondary)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Retour
+                    </button>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div style={{ 
@@ -153,6 +218,18 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onTaskCreated, onTaskUpdated,
                         : 'Remplissez le formulaire ci-dessous pour créer une nouvelle tâche'
                     }
                 </p>
+                {!isAdmin && (
+                    <div style={{
+                        marginTop: '10px',
+                        padding: '8px 12px',
+                        backgroundColor: 'var(--info-bg)',
+                        borderRadius: '6px',
+                        fontSize: '0.875rem',
+                        color: 'var(--info-text)'
+                    }}>
+                        ℹ️ En tant qu'utilisateur, vous ne pouvez modifier que vos propres tâches
+                    </div>
+                )}
             </div>
 
             {errors.general && (
@@ -318,61 +395,95 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onTaskCreated, onTaskUpdated,
                     </div>
                 </div>
 
-                <div>
-                    <label style={{ 
-                        display: 'block', 
-                        marginBottom: '8px', 
-                        fontWeight: '600',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.95rem'
-                    }}>
-                        Assigné à *
-                    </label>
-                    <select
-                        name="assignedTo"
-                        value={formData.assignedTo}
-                        onChange={handleChange}
-                        style={{
-                            width: '100%',
+                {canChangeAssignment && (
+                    <div>
+                        <label style={{ 
+                            display: 'block', 
+                            marginBottom: '8px', 
+                            fontWeight: '600',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.95rem'
+                        }}>
+                            Assigné à *
+                        </label>
+                        <select
+                            name="assignedTo"
+                            value={formData.assignedTo}
+                            onChange={handleChange}
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                border: errors.assignedTo ? '2px solid var(--button-danger)' : '1px solid var(--input-border)',
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                backgroundColor: 'var(--input-bg)',
+                                color: 'var(--text-primary)',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                            }}
+                            disabled={isSubmitting}
+                        >
+                            <option value="">Sélectionner un utilisateur</option>
+                            {users.map(user => (
+                                <option key={user._id} value={user._id}>
+                                    {user.username} ({user.email})
+                                </option>
+                            ))}
+                        </select>
+                        {users.length === 0 && isAdmin && (
+                            <div style={{ 
+                                color: 'var(--text-secondary)', 
+                                fontSize: '0.875rem', 
+                                marginTop: '5px',
+                                fontStyle: 'italic'
+                            }}>
+                                Chargement des utilisateurs...
+                            </div>
+                        )}
+                        {errors.assignedTo && (
+                            <div style={{ 
+                                color: 'var(--button-danger)', 
+                                fontSize: '0.875rem', 
+                                marginTop: '5px',
+                                fontWeight: '500'
+                            }}>
+                                {errors.assignedTo}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {!canChangeAssignment && (
+                    <div>
+                        <label style={{ 
+                            display: 'block', 
+                            marginBottom: '8px', 
+                            fontWeight: '600',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.95rem'
+                        }}>
+                            Assigné à
+                        </label>
+                        <div style={{
                             padding: '12px 16px',
-                            border: errors.assignedTo ? '2px solid var(--button-danger)' : '1px solid var(--input-border)',
+                            border: '1px solid var(--input-border)',
                             borderRadius: '8px',
                             fontSize: '1rem',
                             backgroundColor: 'var(--input-bg)',
-                            color: 'var(--text-primary)',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease'
-                        }}
-                        disabled={isSubmitting}
-                    >
-                        <option value="">Sélectionner un utilisateur</option>
-                        {users.map(user => (
-                            <option key={user._id} value={user._id}>
-                                {user.username} ({user.email})
-                            </option>
-                        ))}
-                    </select>
-                    {users.length === 0 && (
+                            color: 'var(--text-primary)'
+                        }}>
+                            {task ? task.assignedTo.username : user?.username}
+                        </div>
                         <div style={{ 
                             color: 'var(--text-secondary)', 
                             fontSize: '0.875rem', 
                             marginTop: '5px',
                             fontStyle: 'italic'
                         }}>
-                            Chargement des utilisateurs...
+                            Seuls les administrateurs peuvent modifier l'assignation
                         </div>
-                    )}
-                    {errors.assignedTo && (
-                        <div style={{ 
-                            color: 'var(--button-danger)', 
-                            fontSize: '0.875rem', 
-                            marginTop: '5px',
-                            fontWeight: '500'
-                        }}>
-                            {errors.assignedTo}
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 <div style={{ 
                     display: 'flex', 

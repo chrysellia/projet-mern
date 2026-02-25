@@ -23,7 +23,6 @@
   --button-warning: #f59e0b;
   --button-warning-hover: #d97706;
   --input-bg: #ffffff;
-  --input-border: #d1d5db;
   --input-focus: #3b82f6;
   --modal-bg: #ffffff;
   --modal-overlay: rgba(0, 0, 0, 0.5);
@@ -34,13 +33,14 @@
   --success-border: #86efac;
   --success-text: #166534;
   --warning-bg: #fffbeb;
-  --warning-border: #fde68a;
-  --warning-text: #92400e;
+  --warning-border: #fbbf24;
+  --warning-text: #d97706;
+  --info-bg: #e3f2fd;
+  --info-border: #2196f3;
+  --info-text: #1976d2;
   --danger-bg: #fef2f2;
   --danger-border: #fecaca;
   --danger-text: #991b1b;
-  --info-bg: #eff6ff;
-  --info-border: #bfdbfe;
   --info-text: #0369a1;
 }
 

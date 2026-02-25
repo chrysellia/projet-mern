@@ -183,7 +183,7 @@ router.put('/:id', protect, async (req, res) => {
         }
 
         // If updating assignedTo, check if user exists and permissions
-        if (updates.assignedTo) {
+        if (updates.assignedTo && updates.assignedTo !== task.assignedTo.toString()) {
             let assignedUser;
             try {
                 // Si c'est une chaîne, essayer de convertir en ObjectId
@@ -213,18 +213,16 @@ router.put('/:id', protect, async (req, res) => {
                 return res.status(400).json({ message: 'Assigned user not found' });
             }
 
-            // Only admin or creator can change assignment
-            if (!isAdmin && !isCreator) {
-                return res.status(403).json({ message: 'Cannot change task assignment' });
-            }
-
-            // Users can only assign to themselves unless they're admin
-            if (!isAdmin && updates.assignedTo !== req.user._id.toString()) {
-                return res.status(403).json({ message: 'You can only assign tasks to yourself' });
+            // Only admin can change assignment
+            if (!isAdmin) {
+                return res.status(403).json({ message: 'Only administrators can change task assignment' });
             }
 
             // Utiliser l'ObjectId réel pour la mise à jour
             updates.assignedTo = assignedUser._id;
+        } else if (updates.assignedTo === task.assignedTo.toString()) {
+            // L'utilisateur garde la même assignation, pas de vérification nécessaire
+            updates.assignedTo = task.assignedTo;
         }
 
         const updatedTask = await Task.findByIdAndUpdate(
