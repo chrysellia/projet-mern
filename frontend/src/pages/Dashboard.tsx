@@ -11,16 +11,11 @@ import AdminNotificationPanel from '../components/AdminNotificationPanel';
 import '../styles/themes.css';
 
 const Dashboard: React.FC = () => {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'dashboard' | 'tasks' | 'create' | 'users'>('dashboard');
     const [refreshTasks, setRefreshTasks] = useState(0);
     const [refreshNotifications, setRefreshNotifications] = useState(0);
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
 
     const handleTaskCreated = () => {
         setRefreshTasks(prev => prev + 1);
@@ -61,20 +56,6 @@ const Dashboard: React.FC = () => {
                         Bienvenue {user?.username} ({user?.role})
                     </p>
                 </div>
-                <button
-                    onClick={handleLogout}
-                    className="btn-danger"
-                    style={{
-                        padding: '10px 20px',
-                        backgroundColor: 'var(--button-danger)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                    }}
-                >
-                    Déconnexion
-                </button>
             </header>
 
             <div style={{ marginBottom: '20px' }}>

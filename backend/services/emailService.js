@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
 // Configuration du transporteur d'emails
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
