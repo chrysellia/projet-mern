@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: task-management-mongodb-dev
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: task-management
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_dev:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - task-management-network
+
+  # Backend API (Development)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task-management-backend-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 5001
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/task-management?authSource=admin
+      JWT_SECRET: votre-secret-key-tres-securise-123456789
+      JWT_EXPIRE: 7d
+      EMAIL_USER: ${EMAIL_USER:-priscilliachryso@gmail.com}
+      EMAIL_PASS: ${EMAIL_PASS:-votre-mot-de-passe-app-généré}
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "5001:5001"
+      - "9229:9229"  # Debug port
+    depends_on:
+      - mongodb
+    networks:
+      - task-management-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # Frontend (Development with hot reload)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: task-management-frontend-dev
+    restart: unless-stopped
+    environment:
+      REACT_APP_API_URL: http://localhost:5001/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - task-management-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: task-management-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_dev:/data
+    networks:
+      - task-management-network
+
+volumes:
+  mongodb_data_dev:
+    driver: local
+  redis_data_dev:
+    driver: local
+
+networks:
+  task-management-network:
+    driver: bridge
